@@ -57,12 +57,20 @@ export class UpdateUser extends OpenAPIRoute {
       return apiError(check.error, 401)
     }
 
-    const user = await getUser(env, userName)
+    const userNameParsed = userName.toLowerCase()
+
+    const user = await getUser(env, userNameParsed)
     if (!user) {
       return apiError(errorUserNotFound, 400)
     }
 
-    const accounts = uniq(user.access_accounts.concat(...body.access_accounts))
+    if (!user.access_accounts) {
+      user.access_accounts = []
+    }
+
+    const addAccounts = body.accounts.map((account: string) => account.toLowerCase())
+
+    const accounts = uniq(user.access_accounts.concat(...addAccounts))
 
     user.access_accounts = accounts
 

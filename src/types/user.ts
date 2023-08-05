@@ -14,5 +14,5 @@ export const openAPICreateUser = {
 }
 
 export const openAPIUpdateUser = {
-  access_accounts: [new Str()],
+  accounts: [new Str()],
 }

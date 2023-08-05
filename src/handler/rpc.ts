@@ -24,11 +24,11 @@ const handleCallRequest = async (user: IUserData, env: IEnv, request: IRequest):
     return apiErrorJSON(errorMisssingParams('eth_call'), request.id)
   }
 
-  if (!tokensAvailable.includes(callInformation.to)) {
+  if (!tokensAvailable.includes(callInformation.to.toLowerCase())) {
     return apiErrorJSON(errorInvalidTokenForGetBalance, request.id)
   }
 
-  const functionSignature = callInformation.data.slice(10)
+  const functionSignature = callInformation.data.slice(0, 10)
   if (functionSignature !== balanceOfFunctionSignature) {
     return apiErrorJSON(errorInvalidCallFunction, request.id)
   }
@@ -50,6 +50,7 @@ const handleBalanceRequest = async (user: IUserData, env: IEnv, request: IReques
   }
 
   const address = request.params[0].toLowerCase()
+
   if (!user.access_accounts.includes(address) && address !== user.user_name.toLowerCase()) {
     return apiErrorJSON(errorUnableToAccessAccount, request.id)
   }

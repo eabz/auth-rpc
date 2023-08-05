@@ -9,7 +9,9 @@ import {
   getUserFromToken,
 } from '@/utils'
 
-export function decodeToken(authToken: string): { token: string; user: string } | undefined {
+export function decodeToken(authToken?: string): { token: string; user: string } | undefined {
+  if (!authToken || authToken === '') return
+
   const separatedToken = authToken.split(' ')
   if (separatedToken.length !== 2) {
     return

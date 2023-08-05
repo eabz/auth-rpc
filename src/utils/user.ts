@@ -25,5 +25,7 @@ export async function getUser(env: IEnv, userName: string): Promise<IUserData | 
 }
 
 export async function storeUser(env: IEnv, user: IUserData) {
-  await env.USERS.put(user.user_name.toLowerCase(), JSON.stringify(user))
+  user.user_name = user.user_name.toLowerCase()
+
+  await env.USERS.put(user.user_name, JSON.stringify(user))
 }
