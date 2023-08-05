@@ -14,3 +14,16 @@ export async function getUserFromToken(env: IEnv, authToken: string): Promise<IU
 
   return JSON.parse(dbUserData)
 }
+
+export async function getUser(env: IEnv, userName: string): Promise<IUserData | undefined> {
+  const dbUserData = await env.USERS.get(userName)
+  if (!dbUserData) {
+    return
+  }
+
+  return JSON.parse(dbUserData)
+}
+
+export async function storeUser(env: IEnv, user: IUserData) {
+  await env.USERS.put(user.user_name.toLowerCase(), JSON.stringify(user))
+}
