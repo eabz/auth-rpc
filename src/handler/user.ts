@@ -1,6 +1,6 @@
 import { Header, OpenAPIRoute, Str } from '@cloudflare/itty-router-openapi'
 
-import { apiSuccess } from '@/responses'
+import { apiError, apiSuccess } from '@/responses'
 import { IEnv, openAPIUpdateUser } from '@/types'
 import { checkAuth } from '@/utils'
 
@@ -17,9 +17,9 @@ export class UpdateUser extends OpenAPIRoute {
   async handle(request: Request, env: IEnv, ctx: ExecutionContext, data: Record<string, any>) {
     const { Authorization: authToken, body } = data
 
-    const error = await checkAuth(env, authToken, 'admin')
-    if (error) {
-      return error
+    const check = await checkAuth(env, authToken, 'admin')
+    if (check.error) {
+      return apiError(check.error, 401)
     }
 
     const { user_name: userName } = body

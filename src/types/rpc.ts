@@ -12,4 +12,5 @@ export interface IRequest {
   jsonrpc: string
   method?: string
   params?: any[]
+  result?: any
 }

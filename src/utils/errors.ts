@@ -5,3 +5,5 @@ export const errorInvalidAuthUserRoleMismatch = 'invalid auth: user role mismatc
 export const errorInvalidAuthUserTokenMismatch = 'invalid auth: user token mismatch'
 
 export const errorInvalidToken = 'invalid auth: invalid token'
+
+export const errorInternalAuthedWithoutUser = 'internal server error: authed but user information not found'

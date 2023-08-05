@@ -1,39 +1,51 @@
 import { Buffer } from 'node:buffer'
 
-import { apiError } from '@/responses'
 import { IEnv, IUserData } from '@/types'
 import {
   errorInvalidAuthUserNotFound,
   errorInvalidAuthUserRoleMismatch,
   errorInvalidAuthUserTokenMismatch,
   errorInvalidToken,
+  getUserFromToken,
 } from '@/utils'
 
-export async function checkAuth(env: IEnv, authToken: string, role: string): Promise<Response | undefined> {
+export function decodeToken(authToken: string): { token: string; user: string } | undefined {
   const separatedToken = authToken.split(' ')
   if (separatedToken.length !== 2) {
-    return apiError(errorInvalidToken, 401)
+    return
   }
 
   const buff = Buffer.from(separatedToken[1], 'base64')
 
   const auth = buff.toString()
 
-  const [user, userAuthToken] = auth.split(':')
+  const [user, token] = auth.split(':')
 
-  const dbUserData = await env.USERS.get(user)
-  if (!dbUserData) {
-    return apiError(errorInvalidAuthUserNotFound, 401)
+  return { token, user }
+}
+
+export async function checkAuth(
+  env: IEnv,
+  authToken: string,
+  role?: string,
+): Promise<{ error?: string; user?: IUserData }> {
+  const token = decodeToken(authToken)
+  if (!token) {
+    return { error: errorInvalidToken }
   }
 
-  const userData: IUserData = JSON.parse(dbUserData)
-  if (userData.role !== role) {
-    return apiError(errorInvalidAuthUserRoleMismatch, 401)
+  const user = await getUserFromToken(env, authToken)
+  if (!user) {
+    return { error: errorInvalidAuthUserNotFound }
   }
 
-  if (userData.access_token !== userAuthToken) {
-    return apiError(errorInvalidAuthUserTokenMismatch, 401)
+  if (role && user.role !== role) {
+    return { error: errorInvalidAuthUserRoleMismatch }
   }
 
-  return
+  if (user.access_token !== token.token) {
+    return { error: errorInvalidAuthUserTokenMismatch }
+  }
+
+  return { user }
 }
