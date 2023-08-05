@@ -1,36 +1,23 @@
-import { Num, OpenAPIRoute, Str } from '@cloudflare/itty-router-openapi'
+import { Header, OpenAPIRoute, Str } from '@cloudflare/itty-router-openapi'
 
 import { apiSuccessJSON } from '@/responses'
-
-const rpcRequestBody = {
-  id: new Num(),
-  jsonrpc: new Str(),
-  method: new Str({ required: false }),
-  params: [new Str({ required: false })],
-}
-
-export interface IRequest {
-  id: number
-  jsonrpc: string
-  method?: string
-  params?: any[]
-}
+import { IEnv, IRequest, openAPIRequest } from '@/types'
 
 export class RpcRequest extends OpenAPIRoute {
   static schema = {
-    parameters: {},
-    requestBody: rpcRequestBody,
-    responses: {
-      '200': {},
-      '500': {},
+    parameters: {
+      Authorization: Header(Str, { required: false }),
     },
-    summary: 'RPC Post request',
+    requestBody: openAPIRequest,
+    summary: 'Endpoint to send any JSON RPC method',
     tags: ['RPC'],
   }
 
-  async handle(request: Request) {
+  async handle(request: Request, env: IEnv, ctx: ExecutionContext, data: Record<string, any>) {
     const payload: IRequest = await request.json()
+    const { Authorization: authToken } = data
 
+    console.log(authToken)
     return apiSuccessJSON({}, payload.id)
   }
 }
