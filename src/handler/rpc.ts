@@ -1,7 +1,7 @@
 import { Header, OpenAPIRoute, Str } from '@cloudflare/itty-router-openapi'
 
 import { balanceOfFunctionSignature, rpcEndpoint, tokensAvailable } from '@/constants'
-import { apiError, apiErrorJSON, apiSuccessJSON } from '@/responses'
+import { apiError, apiErrorJSON } from '@/responses'
 import { IEnv, IRequest, IUserData, openAPIRequest } from '@/types'
 import {
   checkAuth,
@@ -18,22 +18,23 @@ const handleCallRequest = async (user: IUserData, env: IEnv, request: IRequest):
     return apiErrorJSON(errorMisssingParams('eth_call'), request.id)
   }
 
-  const callInformation = request.params[0] as { data?: string; to?: string }
+  const callData = request.params[0] as { data?: string; to?: string }
 
-  if (!callInformation.to || !callInformation.data) {
+  if (!callData.to || !callData.data) {
     return apiErrorJSON(errorMisssingParams('eth_call'), request.id)
   }
 
-  if (!tokensAvailable.includes(callInformation.to.toLowerCase())) {
+  if (!tokensAvailable.includes(callData.to.toLowerCase())) {
     return apiErrorJSON(errorInvalidTokenForGetBalance, request.id)
   }
 
-  const functionSignature = callInformation.data.slice(0, 10)
+  const functionSignature = callData.data.slice(0, 10)
+
   if (functionSignature !== balanceOfFunctionSignature) {
     return apiErrorJSON(errorInvalidCallFunction, request.id)
   }
 
-  const balanceAddress = '0x' + callInformation.data.slice(callInformation.data.length - 40)
+  const balanceAddress = '0x' + callData.data.slice(callData.data.length - 40)
   if (
     !user.access_accounts.includes(balanceAddress.toLowerCase()) &&
     balanceAddress.toLowerCase() !== user.user_name.toLowerCase()
@@ -73,11 +74,7 @@ const handleSendTransactionRequest = async (user: IUserData, env: IEnv, request:
 }
 
 const relayRequest = async (env: IEnv, request: IRequest): Promise<Response> => {
-  const response = await fetch(rpcEndpoint, { body: JSON.stringify(request), method: 'POST' })
-
-  const data: IRequest = await response.json()
-
-  return apiSuccessJSON(data.result, request.id)
+  return await fetch(rpcEndpoint, { body: JSON.stringify(request), method: 'POST' })
 }
 
 export class RpcRequest extends OpenAPIRoute {
@@ -101,17 +98,17 @@ export class RpcRequest extends OpenAPIRoute {
     if (check.user) {
       if (check.user.role === 'admin') {
         return relayRequest(env, body)
-      } else {
-        switch (body.method) {
-          case 'eth_call':
-            return handleCallRequest(check.user, env, body)
-          case 'eth_getBalance':
-            return handleBalanceRequest(check.user, env, body)
-          case 'eth_sendTransaction':
-            return handleSendTransactionRequest(check.user, env, body)
-          default:
-            return apiError(errorAuthInvalidMethod, 401)
-        }
+      }
+
+      switch (body.method) {
+        case 'eth_call':
+          return handleCallRequest(check.user, env, body)
+        case 'eth_getBalance':
+          return handleBalanceRequest(check.user, env, body)
+        case 'eth_sendTransaction':
+          return handleSendTransactionRequest(check.user, env, body)
+        default:
+          return apiError(errorAuthInvalidMethod, 401)
       }
     } else {
       return apiErrorJSON(errorInternalAuthedWithoutUser, body.id)
