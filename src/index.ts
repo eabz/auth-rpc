@@ -4,7 +4,7 @@ import { createCors } from 'itty-cors'
 import { apiError } from '@/responses'
 import { IEnv } from '@/types'
 
-import { CreateUser, RpcRequest } from './handler'
+import { CreateUser, RpcRequest, UpdateUser } from './handler'
 
 const { preflight, corsify } = createCors({
   methods: ['GET', 'POST'],
@@ -40,7 +40,7 @@ router.original.get('/', (request: { url: any }) => Response.redirect(`${request
 
 router.post('/', RpcRequest)
 router.post('/user', CreateUser)
-router.post('/user/:user_name', CreateUser)
+router.post('/user/:user_name', UpdateUser)
 
 router.all('*', () => new Response('Not Found.', { status: 404 }))
 

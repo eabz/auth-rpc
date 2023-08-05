@@ -15,3 +15,9 @@ export const errorUserAlreadyExist = 'cannot create new user: user already exist
 export const errorUserNotFound = 'user not found'
 
 export const errorMisssingParams = (method: string) => 'invalid params for ' + method
+
+export const errorInvalidTokenForGetBalance = 'token not whitelisted to get balance'
+
+export const errorInvalidCallFunction = 'invalid call function'
+
+export const errorUnableToAccessAccount = 'the account trying to view is not accessible'
