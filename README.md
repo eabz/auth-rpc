@@ -1,13 +1,13 @@
 ## Auth RPC
 
-Cloudflare worker to add an auth layer to a blockchain RPC..
+Cloudflare Worker API to add basic auth and custom filtering for a blockchain RPC endpoint.
 
 ## Requirements
 
 - [Node](https://nodejs.org/en/)
 - [Wrangler](https://github.com/cloudflare/wrangler2)
 
-Before starting, you must have logged in into cloudflare using wrangler.
+Before starting, you must have logged in to Cloudflare using Wrangler.
 
 ## Installation
 
@@ -30,7 +30,6 @@ yarn deploy
 ```
 
 ## Commands
-
 - `start`: runs your application on `localhost:8787`.
 - `deploy`: deploys the application to production.
 - `format`: runs the prettier fixes for all the files.
@@ -40,4 +39,4 @@ Check [package.json](./package.json) for other useful scripts.
 
 ## Contribution Guidelines
 
-Developers are expected to follow contribution guidelines to keep the codebase efficient, readable, and standardized. Contribution guidelines are clearly laid out so developers and contributors can submit their work without much revision, resulting in faster development and more useful contributions. These guideliness are specified through the `eslint` modules.
+Developers are expected to follow contribution guidelines to keep the codebase efficient, readable, and standardized. Contribution guidelines are clearly laid out so developers and contributors can submit their work without much revision, resulting in faster development and more useful contributions. These guidelines are specified through the `eslint` modules.
